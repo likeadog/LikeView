@@ -1,0 +1,8 @@
+<resources>
+    <declare-styleable name="LikeView">
+        <attr name="like_textSize" format="dimension" />
+        <attr name="like_iconSize" format="dimension" />
+        <attr name="like_canCancel" format="boolean" />
+    </declare-styleable>
+    <item type="id" name="FloatingText_wrapper" />
+</resources>
