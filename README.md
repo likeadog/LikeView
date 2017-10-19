@@ -1,12 +1,14 @@
 # LikeView
 
-一个点赞效果的view，keyi动画效果可以飞出父view。例如listview中使用，可以飞出当前itemview。
+一个仿即刻点赞效果的view，同时可以设置图标飞出父view。例如listview中使用，可以飞出当前itemview。
 
-![](https://github.com/likeadog/LikeView/blob/master/screenshot/1.gif)  ![](https://github.com/likeadog/LikeView/blob/master/screenshot/2.gif)  
+![](https://github.com/likeadog/LikeView/blob/master/screenshot/1.gif)
+![](https://github.com/likeadog/LikeView/blob/master/screenshot/2.gif)
+![](https://github.com/likeadog/LikeView/blob/master/screenshot/3.gif)
 
 ## gradle
 
-    compile 'com.zhuang:likeview:1.0'
+    compile 'com.zhuang:likeview:2.0'
 
 ## xml
     <com.zhuang.likeviewlibrary.LikeView
