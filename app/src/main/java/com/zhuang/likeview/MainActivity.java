@@ -29,12 +29,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private List<News> createData() {
+        Random random = new Random(47);
         List<News> list = new ArrayList<>();
         for (int i = 0; i < 100; i++) {
             News news = new News();
             news.setTitle(i + "我是标题");
             news.setContent("我是内容我是内容");
-            news.setLikeCount(i);
+            news.setLikeCount(random.nextInt(1000));
             news.setHasLike(i % 4 == 1);
             list.add(news);
         }

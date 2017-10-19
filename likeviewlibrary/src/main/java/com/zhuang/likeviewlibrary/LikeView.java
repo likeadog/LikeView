@@ -12,6 +12,7 @@ import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.text.TextPaint;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -27,8 +28,8 @@ public class LikeView extends View implements View.OnClickListener {
     /**
      * 点赞时，图标有一个缩小扩大再回缩的动作，这两个常量表示缩放时的最大和最小倍数
      */
-    private static float EXPAND_MULTIPLE = 1.2f;
-    private static float SHRINK_MULTIPLE = 0.9f;
+    private static float EXPAND_MULTIPLE = 1.5f;
+    private static float SHRINK_MULTIPLE = 0.8f;
     private static int DURATION = 200;//动画持续时间 ms
 
     private Activity activity;
@@ -184,7 +185,7 @@ public class LikeView extends View implements View.OnClickListener {
 
         //画拇指
         if (hasLike) {
-            int scaleSize = (int) (iconSize * (1 - iconScaleSelect));
+            int scaleSize = (int) (iconSize * (1 - iconScaleSelect)/2);
             drawableSelect.setBounds(
                     paddingLeft + scaleSize + iconSizeAdditional,
                     paddingTop + shiningSize / 2 + scaleSize,
@@ -193,7 +194,7 @@ public class LikeView extends View implements View.OnClickListener {
             );
             drawableSelect.draw(canvas);
         } else {
-            int scaleSize = (int) (iconSize * (1 - iconScaleUnSelect));
+            int scaleSize = (int) (iconSize * (1 - iconScaleUnSelect)/2);
             drawableUnSelect.setBounds(
                     paddingLeft + scaleSize + iconSizeAdditional,
                     paddingTop + shiningSize / 2 + scaleSize,
@@ -205,11 +206,11 @@ public class LikeView extends View implements View.OnClickListener {
 
         //画闪光
         if (hasLike) {
-            int shiningScaleSize = (int) (shiningSize * (1 - shiningScale));
+            int shiningScaleSize = (int) (shiningSize * (1-shiningScale) / 2);
             drawableShining.setBounds(
                     paddingLeft + (iconSize - shiningSize) / 2 + shiningScaleSize + iconSizeAdditional,
                     paddingTop + shiningScaleSize,
-                    iconSize - (iconSize - shiningSize) / 2 + paddingLeft - shiningScaleSize + iconSizeAdditional,
+                    paddingLeft +  (iconSize - shiningSize) / 2 +shiningSize - shiningScaleSize + iconSizeAdditional,
                     paddingTop + shiningSize - shiningScaleSize
             );
             drawableShining.draw(canvas);
@@ -433,7 +434,7 @@ public class LikeView extends View implements View.OnClickListener {
         animating = true;
         ObjectAnimator animator0 = ObjectAnimator.ofFloat(this, "iconScaleSelect", SHRINK_MULTIPLE, EXPAND_MULTIPLE, 1f);
         ObjectAnimator animator1 = ObjectAnimator.ofFloat(this, "iconScaleUnSelect", SHRINK_MULTIPLE, 1f);
-        ObjectAnimator animator2 = ObjectAnimator.ofFloat(this, "shiningScale", 0f, 1f);
+        ObjectAnimator animator2 = ObjectAnimator.ofFloat(this, "shiningScale", 0, 1f);
         ObjectAnimator animator3 = ObjectAnimator.ofInt(this, "countAlphaOut", 255, 0);
         ObjectAnimator animator4 = ObjectAnimator.ofInt(this, "countAlphaIn", 0, 255);
         ObjectAnimator animator5 = ObjectAnimator.ofFloat(this, "countFloatOffset", 0, (iconSize + shiningSize - mTextHeight) / 2);
