@@ -14,4 +14,13 @@ public class ExampleUnitTest {
     public void addition_isCorrect() throws Exception {
         assertEquals(4, 2 + 2);
     }
+
+    @Test
+    public void cutNum() throws Exception {
+        String[] arr = Util.cutNumDel(99);
+        System.out.println(arr[0]);
+        System.out.println(arr[1]);
+        System.out.println(arr[2]);
+        //assertEquals(4, 2 + 2);
+    }
 }

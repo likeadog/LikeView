@@ -2,6 +2,7 @@ package com.zhuang.likeview;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -28,14 +29,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private List<News> createData() {
-        Random random = new Random(47);
         List<News> list = new ArrayList<>();
         for (int i = 0; i < 100; i++) {
             News news = new News();
             news.setTitle(i + "我是标题");
             news.setContent("我是内容我是内容");
-            news.setLikeCount(random.nextInt(1000));
-            news.setHasLike(i % 4 == 0);
+            news.setLikeCount(i);
+            news.setHasLike(i % 4 == 1);
             list.add(news);
         }
         return list;
@@ -66,29 +66,43 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
+            ViewHolder viewHolder;
             if (convertView == null) {
                 convertView = View.inflate(MainActivity.this, R.layout.item_like, null);
+                viewHolder = new ViewHolder();
+                viewHolder.likeView = (LikeView) convertView.findViewById(R.id.likeView);
+                viewHolder.title = (TextView) convertView.findViewById(R.id.title);
+                viewHolder.content = (TextView) convertView.findViewById(R.id.content);
+                convertView.setTag(viewHolder);
+            } else {
+                viewHolder = (ViewHolder) convertView.getTag();
             }
 
-            LikeView likeView = (LikeView) convertView.findViewById(R.id.likeView);
-            TextView title = (TextView) convertView.findViewById(R.id.title);
-            TextView content = (TextView) convertView.findViewById(R.id.content);
-
             final News news = list.get(position);
-            title.setText(news.getTitle());
-            content.setText(news.getContent());
-            likeView.setHasLike(news.isHasLike());
-            likeView.setText(news.getLikeCount() + "");
+            viewHolder.title.setText(news.getTitle());
+            viewHolder.content.setText(news.getContent());
+            viewHolder.likeView.setHasLike(news.isHasLike());
+            viewHolder.likeView.setLikeCount(news.getLikeCount());
 
-            likeView.setOnLikeListeners(new LikeView.OnLikeListeners() {
+            viewHolder.likeView.setOnLikeListeners(new LikeView.OnLikeListeners() {
                 @Override
                 public void like(boolean isCancel) {
                     news.setHasLike(!isCancel);
-                    news.addLikeCount();
+                    if(isCancel){
+                        news.delLikeCount();
+                    }else{
+                        news.addLikeCount();
+                    }
                 }
             });
             return convertView;
         }
+    }
+
+    private class ViewHolder {
+        LikeView likeView;
+        TextView title;
+        TextView content;
     }
 
 }

@@ -27,7 +27,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         app:like_canCancel="true"
-        app:like_iconSize="14dp"
+        app:like_iconSize="18dp"
         app:like_textSize="12sp" />
 
 </RelativeLayout>

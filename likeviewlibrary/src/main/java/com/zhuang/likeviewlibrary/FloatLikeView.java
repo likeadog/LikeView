@@ -16,12 +16,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
+/**
+ * 可以飘起来的一个view，
+ * LikeView{@link LikeView}点击时，会创建FloatLikeView
+ */
 public class FloatLikeView extends View {
 
     Drawable drawable;
     boolean positionSet;
     private View mAttachedView;
-    TextPaint mTextPaint;
     float top;
     Builder builder;
 
@@ -47,12 +50,7 @@ public class FloatLikeView extends View {
     }
 
     private void init() {
-        drawable = getResources().getDrawable(R.drawable.ic_like_red);
-        mTextPaint = new TextPaint();
-        mTextPaint.setColor(Color.parseColor("#d81e06"));
-        mTextPaint.setTextSize(builder.textSize);
-        Paint.FontMetrics fontMetrics = mTextPaint.getFontMetrics();
-        top = fontMetrics.top;
+        drawable = getResources().getDrawable(R.drawable.ic_messages_like_selected);
     }
 
     @Override
@@ -63,12 +61,13 @@ public class FloatLikeView extends View {
 
     @Override
     protected void onDraw(Canvas canvas) {
-        drawable.setBounds(builder.paddingLeft,
+        drawable.setBounds(
+                builder.paddingLeft + builder.iconSizeAdditional,
                 builder.paddingTop,
-                (int) builder.iconSize + builder.paddingLeft,
-                (int) builder.iconSize + builder.paddingTop);
+                (int) builder.iconSize + builder.iconSizeAdditional + builder.paddingLeft,
+                (int) builder.iconSize + builder.paddingTop
+        );
         drawable.draw(canvas);
-        canvas.drawText(builder.text, builder.paddingLeft + builder.iconSize + builder.iconGap, -top + builder.paddingTop, mTextPaint);
     }
 
     public void setAttachedView(View attachedView) {
@@ -99,7 +98,7 @@ public class FloatLikeView extends View {
         ObjectAnimator animator2 = ObjectAnimator.ofFloat(this, View.ALPHA, 0f);
         AnimatorSet animSet = new AnimatorSet();
         animSet.playTogether(animator1, animator2);
-        animSet.setDuration(800);
+        animSet.setDuration(300);
         animSet.start();
 
         animSet.addListener(new Animator.AnimatorListener() {
@@ -135,7 +134,7 @@ public class FloatLikeView extends View {
         int paddingBottom;
         int height;
         int width;
-        String text;
+        int iconSizeAdditional;
         Activity activity;
 
         public Builder iconSize(float iconSize) {
@@ -183,13 +182,13 @@ public class FloatLikeView extends View {
             return this;
         }
 
-        public Builder activity(Activity activity) {
-            this.activity = activity;
+        public Builder iconSizeAdditional(int iconSizeAdditional) {
+            this.iconSizeAdditional = iconSizeAdditional;
             return this;
         }
 
-        public Builder text(String text) {
-            this.text = text;
+        public Builder activity(Activity activity) {
+            this.activity = activity;
             return this;
         }
 

@@ -3,6 +3,7 @@
         <attr name="like_textSize" format="dimension" />
         <attr name="like_iconSize" format="dimension" />
         <attr name="like_canCancel" format="boolean" />
+        <attr name="like_hasFly" format="boolean" />
     </declare-styleable>
     <item type="id" name="FloatingText_wrapper" />
 </resources>

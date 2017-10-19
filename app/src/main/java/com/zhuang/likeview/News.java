@@ -14,6 +14,10 @@ public class News {
         likeCount++;
     }
 
+    public void delLikeCount(){
+        likeCount--;
+    }
+
     public String getTitle() {
         return title;
     }
