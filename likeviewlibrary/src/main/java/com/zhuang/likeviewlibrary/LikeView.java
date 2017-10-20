@@ -185,7 +185,7 @@ public class LikeView extends View implements View.OnClickListener {
 
         //画拇指
         if (hasLike) {
-            int scaleSize = (int) (iconSize * (1 - iconScaleSelect)/2);
+            int scaleSize = (int) (iconSize * (1 - iconScaleSelect) / 2);
             drawableSelect.setBounds(
                     paddingLeft + scaleSize + iconSizeAdditional,
                     paddingTop + shiningSize / 2 + scaleSize,
@@ -194,7 +194,7 @@ public class LikeView extends View implements View.OnClickListener {
             );
             drawableSelect.draw(canvas);
         } else {
-            int scaleSize = (int) (iconSize * (1 - iconScaleUnSelect)/2);
+            int scaleSize = (int) (iconSize * (1 - iconScaleUnSelect) / 2);
             drawableUnSelect.setBounds(
                     paddingLeft + scaleSize + iconSizeAdditional,
                     paddingTop + shiningSize / 2 + scaleSize,
@@ -206,11 +206,11 @@ public class LikeView extends View implements View.OnClickListener {
 
         //画闪光
         if (hasLike) {
-            int shiningScaleSize = (int) (shiningSize * (1-shiningScale) / 2);
+            int shiningScaleSize = (int) (shiningSize * (1 - shiningScale) / 2);
             drawableShining.setBounds(
                     paddingLeft + (iconSize - shiningSize) / 2 + shiningScaleSize + iconSizeAdditional,
                     paddingTop + shiningScaleSize,
-                    paddingLeft +  (iconSize - shiningSize) / 2 +shiningSize - shiningScaleSize + iconSizeAdditional,
+                    paddingLeft + (iconSize - shiningSize) / 2 + shiningSize - shiningScaleSize + iconSizeAdditional,
                     paddingTop + shiningSize - shiningScaleSize
             );
             drawableShining.draw(canvas);
@@ -272,7 +272,7 @@ public class LikeView extends View implements View.OnClickListener {
 
     /**
      * 计算闪光的大小
-     * 闪光图片大小为64*64px;拇指图片大小为80*80px
+     * 原始资源中，闪光图片大小为64*64px;拇指图片大小为80*80px
      * 我们已经设置了iconSize,iconSize对应拇指，这里通过该比例计算出闪光的大小
      */
     private void calculateShiningSize() {
@@ -286,6 +286,119 @@ public class LikeView extends View implements View.OnClickListener {
      */
     private String likeCountToString() {
         return likeCount + "";
+    }
+
+    /**
+     * 切割数字
+     */
+    private void cutNum() {
+        //点赞过，那么再次点击将会减少点赞数，就按减少点赞来切割
+        //没有点赞过，则按增加点赞来切割点赞数
+        if (hasLike) {
+            String[] arr = Util.cutNumDel(likeCount);
+            num1 = arr[0];
+            num2 = arr[1];
+            num3 = arr[2];
+        } else {
+            String[] arr = Util.cutNumAdd(likeCount);
+            num1 = arr[0];
+            num2 = arr[1];
+            num3 = arr[2];
+        }
+        hasCut = true;
+    }
+
+    /**
+     * ui改变为已点赞的效果
+     */
+    private void changeUI() {
+        boolean add = canCancel && hasLike ? false : true;//当前是添加一个赞还是减少一个赞
+        if (add) {
+            likeCount++;
+        } else {
+            likeCount--;
+        }
+        hasLike = canCancel ? !hasLike : true;
+        invalidate();
+        requestLayout();
+    }
+
+    /**
+     * 状态回滚到初始状态
+     */
+    private void resetStatus() {
+        hasCut = false;
+        animating = false;
+    }
+
+    /**
+     * LikeView被点击时的动画
+     */
+    public void startAnimal() {
+        animating = true;
+        //点赞时拇指图标缩放动画
+        ObjectAnimator animator0 = ObjectAnimator.ofFloat(this, "iconScaleSelect", SHRINK_MULTIPLE, EXPAND_MULTIPLE, 1f);
+        //取消点赞时，拇指图标缩放动画
+        ObjectAnimator animator1 = ObjectAnimator.ofFloat(this, "iconScaleUnSelect", SHRINK_MULTIPLE, 1f);
+        //点赞时，闪光缩放动画（取消点赞时，闪光没有动画，直接消失）
+        ObjectAnimator animator2 = ObjectAnimator.ofFloat(this, "shiningScale", 0, 1f);
+        //飘出字体的透明度，由不透明逐渐到完全透明
+        ObjectAnimator animator3 = ObjectAnimator.ofInt(this, "countAlphaOut", 255, 0);
+        //进入字体的透明度，由完全透明到不透明
+        ObjectAnimator animator4 = ObjectAnimator.ofInt(this, "countAlphaIn", 0, 255);
+        //字体替换时的位移动画
+        ObjectAnimator animator5 = ObjectAnimator.ofFloat(this, "countFloatOffset", 0, (iconSize + shiningSize - mTextHeight) / 2);
+        AnimatorSet animSet = new AnimatorSet();
+        animSet.setDuration(DURATION);
+        //点赞时动画与取消点赞时动画稍微不一样，主要表现在拇指与闪光的动画上
+        if (hasLike) {
+            animSet.playTogether(animator0, animator2, animator3, animator4, animator5);
+        } else {
+            animSet.playTogether(animator1, animator3, animator4, animator5);
+        }
+        animSet.addListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                resetStatus();
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animation) {
+
+            }
+        });
+        animSet.start();
+    }
+
+    @Override
+    public void onClick(View v) {
+        if (hasLike && !canCancel) {
+            Toast.makeText(activity, "您已经赞过了", Toast.LENGTH_SHORT).show();
+            return;
+        } else {
+            if (animating) return;
+            //点赞时，飘出一个大拇指
+            if (!hasLike && hasFly) {
+                createLayoutWrapper();
+                addView2LayoutWrapper();
+            }
+            cutNum();
+            changeUI();
+            startAnimal();
+            if (onLikeListeners != null) {
+                onLikeListeners.like(!hasLike);
+            }
+        }
     }
 
     /**
@@ -329,45 +442,15 @@ public class LikeView extends View implements View.OnClickListener {
         floatLikeView.start(floatingTextWrapper);
     }
 
-    /**
-     * 切割数字
-     */
-    private void cutNum() {
-        //点赞过，那么再次点击将会减少点赞数，就按减少点赞来切割
-        //没有点赞过，则按增加点赞来切割点赞数
-        if (hasLike) {
-            String[] arr = Util.cutNumDel(likeCount);
-            num1 = arr[0];
-            num2 = arr[1];
-            num3 = arr[2];
-        } else {
-            String[] arr = Util.cutNumAdd(likeCount);
-            num1 = arr[0];
-            num2 = arr[1];
-            num3 = arr[2];
-        }
-        hasCut = true;
-    }
-
-    /**
-     * ui改变为已点赞的效果
-     */
-    private void changeUI() {
-        boolean add = canCancel && hasLike ? false : true;//当前是添加一个赞还是减少一个赞
-        if (add) {
-            likeCount++;
-        } else {
-            likeCount--;
-        }
-        hasLike = canCancel ? !hasLike : true;
-        invalidate();
-        requestLayout();
-    }
-
     public void setLikeCount(int likeCount) {
         this.likeCount = likeCount;
         invalidate();
         requestLayout();
+    }
+
+    public void setHasLike(boolean hasLike) {
+        this.hasLike = hasLike;
+        invalidate();
     }
 
     public float getIconScaleSelect() {
@@ -416,78 +499,6 @@ public class LikeView extends View implements View.OnClickListener {
 
     public void setCountFloatOffset(float countFloatOffset) {
         this.countFloatOffset = countFloatOffset;
-        invalidate();
-    }
-
-    /**
-     * 状态回滚到初始状态
-     */
-    private void resetStatus() {
-        hasCut = false;
-        animating = false;
-    }
-
-    /**
-     * LikeView被点击时的动画
-     */
-    public void startAnimal() {
-        animating = true;
-        ObjectAnimator animator0 = ObjectAnimator.ofFloat(this, "iconScaleSelect", SHRINK_MULTIPLE, EXPAND_MULTIPLE, 1f);
-        ObjectAnimator animator1 = ObjectAnimator.ofFloat(this, "iconScaleUnSelect", SHRINK_MULTIPLE, 1f);
-        ObjectAnimator animator2 = ObjectAnimator.ofFloat(this, "shiningScale", 0, 1f);
-        ObjectAnimator animator3 = ObjectAnimator.ofInt(this, "countAlphaOut", 255, 0);
-        ObjectAnimator animator4 = ObjectAnimator.ofInt(this, "countAlphaIn", 0, 255);
-        ObjectAnimator animator5 = ObjectAnimator.ofFloat(this, "countFloatOffset", 0, (iconSize + shiningSize - mTextHeight) / 2);
-        AnimatorSet animSet = new AnimatorSet();
-        animSet.setDuration(DURATION);
-        animSet.playTogether(animator0, animator1, animator2, animator3, animator4, animator5);
-        animSet.addListener(new Animator.AnimatorListener() {
-            @Override
-            public void onAnimationStart(Animator animation) {
-
-            }
-
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                resetStatus();
-            }
-
-            @Override
-            public void onAnimationCancel(Animator animation) {
-
-            }
-
-            @Override
-            public void onAnimationRepeat(Animator animation) {
-
-            }
-        });
-        animSet.start();
-    }
-
-    @Override
-    public void onClick(View v) {
-        if (hasLike && !canCancel) {
-            Toast.makeText(activity, "您已经赞过了", Toast.LENGTH_SHORT).show();
-            return;
-        } else {
-            if (animating) return;
-            //点赞时，飘出一个大拇指
-            if (!hasLike && hasFly) {
-                createLayoutWrapper();
-                addView2LayoutWrapper();
-            }
-            cutNum();
-            changeUI();
-            startAnimal();
-            if (onLikeListeners != null) {
-                onLikeListeners.like(!hasLike);
-            }
-        }
-    }
-
-    public void setHasLike(boolean hasLike) {
-        this.hasLike = hasLike;
         invalidate();
     }
 
