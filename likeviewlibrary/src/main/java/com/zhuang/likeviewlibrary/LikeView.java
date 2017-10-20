@@ -350,7 +350,7 @@ public class LikeView extends View implements View.OnClickListener {
         ObjectAnimator animator5 = ObjectAnimator.ofFloat(this, "countFloatOffset", 0, (iconSize + shiningSize - mTextHeight) / 2);
         AnimatorSet animSet = new AnimatorSet();
         animSet.setDuration(DURATION);
-        //点赞时动画与取消点赞时动画稍微不一样，主要表现在拇指与闪光的动画上
+        //点赞时动画与取消点赞时动画稍微不一样，主要表现在拇指与闪光的动画上。
         if (hasLike) {
             animSet.playTogether(animator0, animator2, animator3, animator4, animator5);
         } else {
