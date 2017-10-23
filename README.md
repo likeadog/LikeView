@@ -8,7 +8,7 @@
 
 ## gradle
 
-    compile 'com.zhuang:likeview:2.0'
+    compile 'com.zhuang:likeview:2.1'
 
 ## xml
     <com.zhuang.likeviewlibrary.LikeView
